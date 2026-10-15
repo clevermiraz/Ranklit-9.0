@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ranklit
 
-## Getting Started
+Marketing site + product app for **Ranklit**, an AI local-SEO agent for Google Business Profiles.
+Built with Next.js 16 (App Router, Cache Components), React 19, TypeScript and Tailwind CSS v4.
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local   # set SESSION_SECRET (required in production)
+npm install
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Demo login (fully populated account): `demo@ranklit.com` / `demo1234`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What's inside
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Area | Routes |
+| --- | --- |
+| Marketing | `/`, `/features`, `/pricing`, `/rank-tracker`, `/local-business`, `/agencies`, `/agencies/pricing`, `/case-studies/[slug]`, `/about`, `/privacy`, `/terms` |
+| Content | `/blog`, `/blog/[slug]`, `/blog/tag/[tag]`, `/local-seo`, `/local-seo/[industry]`, `/local-seo/[industry]/[city]` |
+| Free tools | `/tools`, `/tools/[slug]` (22 tools) + `POST /api/tools/[slug]` |
+| Auth & billing | `/checkout` → `/signup?session_id=…` → `/dashboard`, `/login`, `/forgot-password`, `/reset-password`, `/logout` |
+| App | Home `/dashboard` · Rankings (`/dashboard/rankings`, `/scans`, `/ai-visibility`) · Reviews (`/dashboard/reviews`, `/get-reviews`, `/review-widget`) · Google Profile (`/dashboard/gbp`, `/gbp/posts`, `/gbp-insights`, `/gbp-audit`) · Listings (`/dashboard/citations`, `/listings`) · Website (`/dashboard/website`, `/organic-seo`, `/tools`) · Autopilot (`/dashboard/autopilot`, `/settings/automations`, `/dashboard/strategy`) · Add-ons `/dashboard/upgrades` · Settings (`/settings`, `/dashboard/businesses`, `/settings/plans`, `/dashboard/alerts`, `/settings/api`) |
+| Public | Customer review page `/review/[slug]`, review widget embed `/api/embed/widget.js` |
 
-## Learn More
+## Architecture notes
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app/(marketing)` — public pages sharing the header/footer layout.
+- `src/app/(app)` — the logged-in app; its layout renders the shell (sidebar, header with Ctrl+K palette, trial banner, section tabs from `src/lib/app/nav.ts`).
+- `src/components/app` — dashboard UI kit (`ui.tsx`, `controls.tsx`, `charts.tsx`) and per-section client components.
+- `src/app/actions` — server actions for auth, checkout and dashboard mutations.
+- `src/lib/session.ts` — HMAC-signed cookies/tokens (Web Crypto). `src/proxy.ts` guards `/dashboard`.
+- `src/lib/pricing.ts` — single source of truth for plans, volume tiers and price math.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Mock data — what to replace for production
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Everything below sits behind a small set of functions, so the UI does not change when you swap it:
 
-## Deploy on Vercel
+| Mock | File | Replace with |
+| --- | --- | --- |
+| Users (in-memory, resets on restart) | `src/lib/server/users.ts` | A database (e.g. Postgres) |
+| Business data (profile, strategy, scans, reviews, posts, insights, citations…) | `src/lib/server/store.ts` (+ `*-store.ts` section modules) | Google Business Profile API, a geo-grid rank-scan provider, your DB |
+| Payment step (card is validated client-side only, never sent) | `src/app/actions/checkout.ts`, `src/components/checkout/checkout-form.tsx` | Stripe Checkout / Payment Element + webhooks |
+| AI tool results, review replies, post copy (templated) | `src/lib/tools/generate.ts` and the section action files in `src/app/actions/` | An LLM call |
+| Password-reset emails | `requestPasswordReset` in `src/app/actions/auth.ts` | An email provider |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Test card at checkout: `4242 4242 4242 4242`, any future expiry, any CVC.

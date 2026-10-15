@@ -1,26 +1,131 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --font-sans: var(--font-inter-tight), Inter, ui-sans-serif, system-ui, sans-serif;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-ink: #231938;
+  --color-canvas: #f9f7fc;
+  --color-night: #150f22;
+  --color-night-2: #1f1631;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-brand-50: #fbf3fe;
+  --color-brand-100: #f6e6fc;
+  --color-brand-200: #ecccf7;
+  --color-brand-300: #dca6ef;
+  --color-brand-400: #c47ae3;
+  --color-brand-500: #b95fe0;
+  --color-brand-600: #9b47cc;
+  --color-brand-700: #8d3ebb;
+  --color-brand-800: #6f2d99;
+  --color-brand-900: #4a1d68;
+
+  --color-rank-good: #16a34a;
+  --color-rank-mid: #f59e0b;
+  --color-rank-bad: #ef4444;
+
+  --shadow-card: 0 1px 2px rgb(35 25 56 / 0.04), 0 8px 24px -12px rgb(35 25 56 / 0.12);
+  --shadow-lift: 0 30px 60px -20px rgb(35 25 56 / 0.35);
+  --shadow-brand: 0 10px 30px -10px rgb(141 62 187 / 0.6);
+
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-canvas text-ink antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1, h2, h3, h4 {
+    @apply font-extrabold text-ink;
+    text-wrap: balance;
+  }
+  ::selection {
+    @apply bg-brand-200 text-ink;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-600;
+  }
 }
+
+@utility text-gradient {
+  background-image: linear-gradient(100deg, #8d3ebb 0%, #b95fe0 50%, #8d3ebb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility text-gradient-light {
+  background-image: linear-gradient(100deg, #d9a6f5 0%, #f0d2ff 50%, #c98ce9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-brand-gradient {
+  background-image: linear-gradient(135deg, #9b47cc 0%, #8d3ebb 45%, #6f2d99 100%);
+}
+
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(35 25 56 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(35 25 56 / 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+@utility bg-grid-dark {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+@utility mask-fade-x {
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+@utility tracking-display {
+  letter-spacing: -0.035em;
+}
+
+/* Prose for blog posts and legal pages */
+@utility prose-ranklit {
+  & h2 { @apply mt-12 mb-4 text-3xl tracking-tight; }
+  & h3 { @apply mt-8 mb-3 text-xl tracking-tight; }
+  & p { @apply my-4 text-lg leading-8 text-ink/75; }
+  & ul { @apply my-4 list-disc space-y-2 pl-6 text-lg leading-8 text-ink/75; }
+  & ol { @apply my-4 list-decimal space-y-2 pl-6 text-lg leading-8 text-ink/75; }
+  & a { @apply font-semibold text-brand-700 underline underline-offset-2; }
+  & strong { @apply font-semibold text-ink; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dashboard dark theme (toggled from the header). Overrides the light surfaces used by the app UI kit. */
+.app-dark body { color-scheme: dark; }
+.app-dark .bg-\[\#f5f2f9\] { background-color: #120c1d; }
+.app-dark main .bg-white, .app-dark header.bg-white, .app-dark nav.bg-white { background-color: #1c1429; }
+.app-dark main, .app-dark header, .app-dark nav { color: #ece6f4; }
+.app-dark main .text-ink, .app-dark header .text-ink { color: #ece6f4; }
+.app-dark main [class*="text-ink/"], .app-dark header [class*="text-ink/"] { color: rgb(236 230 244 / 0.65); }
+.app-dark main [class*="border-[#ece6f4]"], .app-dark main [class*="border-[#e4dcef]"], .app-dark header, .app-dark nav { border-color: #2f2440; }
+.app-dark main [class*="bg-[#f"], .app-dark main [class*="bg-[#e"] { background-color: #261c36; }
+.app-dark main input, .app-dark main textarea, .app-dark main select { background-color: #150f22; color: #ece6f4; border-color: #2f2440; }
