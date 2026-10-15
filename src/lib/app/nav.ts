@@ -1,6 +1,7 @@
 import {
   Bell,
   Bot,
+  Briefcase,
   Building2,
   ClipboardCheck,
   Code2,
@@ -10,6 +11,7 @@ import {
   Globe,
   House,
   Link2,
+  Mail,
   MapPin,
   MessageSquare,
   Plug,
@@ -30,6 +32,19 @@ export type Section = { key: string; label: string; href: string; icon: LucideIc
 
 export const sections: Section[] = [
   { key: "home", label: "Home", href: "/dashboard", icon: House, group: 1, tabs: [] },
+  {
+    key: "agency",
+    label: "Agency",
+    href: "/dashboard/agency",
+    icon: Briefcase,
+    group: 1,
+    tabs: [
+      { label: "Clients", href: "/dashboard/agency", icon: Building2 },
+      { label: "Client emails", href: "/dashboard/agency/emails", icon: Mail },
+      { label: "Branding & domain", href: "/dashboard/agency/branding", icon: Globe },
+      { label: "Reports", href: "/dashboard/reports", icon: FileText },
+    ],
+  },
   {
     key: "rankings",
     label: "Rankings",

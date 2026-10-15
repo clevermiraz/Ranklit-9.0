@@ -102,12 +102,19 @@ export function AgencyToolsLink({ onGrowth }: { onGrowth: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <p className="text-xs text-ink/55">
-        Managing local SEO for clients?{" "}
-        <button type="button" onClick={() => setOpen(true)} className="font-semibold text-brand-700 hover:underline">
-          Enable agency tools
-        </button>
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+        <p className="text-ink/65">
+          Managing local SEO for clients?
+        </p>
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard/agency" className="inline-flex items-center gap-1 font-semibold text-brand-700 hover:underline">
+            <Briefcase className="size-3.5" /> Open Agency Dashboard
+          </Link>
+          <button type="button" onClick={() => setOpen(true)} className="text-ink/45 hover:text-ink">
+            Details
+          </button>
+        </div>
+      </div>
       <Modal
         open={open}
         onClose={() => setOpen(false)}
